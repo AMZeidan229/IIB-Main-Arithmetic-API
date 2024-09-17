@@ -1,0 +1,71 @@
+CREATE COMPUTE MODULE postCalculator_Compute1
+
+    CREATE FUNCTION CountJsonFields(IN jsonRef REFERENCE) RETURNS INTEGER
+    BEGIN
+        -- Initialize the field count 
+        DECLARE fieldCount INTEGER;
+        SET fieldCount = 0;
+
+        -- Reference to the first field in the JSON object
+        DECLARE fieldRef REFERENCE TO jsonRef;
+        MOVE fieldRef FIRSTCHILD;
+
+        -- Iterate through the fields
+        WHILE LASTMOVE(fieldRef) DO
+            -- Increment field count for each field found
+            SET fieldCount = fieldCount + 1;
+
+            -- Move to the next sibling (field)
+            MOVE fieldRef NEXTSIBLING;
+        END WHILE;
+
+        -- Return the field count
+        RETURN fieldCount;
+    END;
+
+    CREATE FUNCTION Main() RETURNS BOOLEAN
+    BEGIN
+        DECLARE jsonBody REFERENCE TO InputRoot.JSON.Data;
+        DECLARE isValid BOOLEAN;
+
+        -- Check if the JSON object has exactly 2 fields
+        IF CountJsonFields(jsonBody) = 2 THEN
+            IF FIELDNAME(jsonBody.operation) IS NOT NULL THEN
+                IF jsonBody.operation IN ('add', 'subtract', 'multiply', 'divide') THEN
+                    IF FIELDNAME(jsonBody.nums) IS NOT NULL THEN
+                        CREATE FIELD OutputRoot.JSON.Data;
+                        DECLARE outref REFERENCE TO OutputRoot.JSON.Data;
+                        SET outref = jsonBody;
+                        PROPAGATE TO LABEL 'valid';
+                        RETURN TRUE;
+                    ELSE
+                        -- nums field does not exist
+                        CREATE FIELD OutputRoot.JSON.Data.error;
+                        SET OutputRoot.JSON.Data.error = 'nums field does not exist';
+                        PROPAGATE TO LABEL 'invalid';
+                        RETURN FALSE;
+                    END IF;
+                ELSE
+                    -- invalid operation value
+                    CREATE FIELD OutputRoot.JSON.Data.error;
+                    SET OutputRoot.JSON.Data.error = 'Invalid operation value';
+                    PROPAGATE TO LABEL 'invalid';
+                    RETURN FALSE;
+                END IF;
+            ELSE
+                -- Operation field does not exist
+                CREATE FIELD OutputRoot.JSON.Data.error;
+                SET OutputRoot.JSON.Data.error = 'Operation field does not exist';
+                PROPAGATE TO LABEL 'invalid';
+                RETURN FALSE;
+            END IF;
+        ELSE
+            -- The JSON body has more than 2 fields
+            CREATE FIELD OutputRoot.JSON.Data.error;
+            SET OutputRoot.JSON.Data.error = 'The JSON body should have 2 fields';
+            PROPAGATE TO LABEL 'invalid';
+            RETURN FALSE;
+        END IF;
+    END;
+
+END MODULE;

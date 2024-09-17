@@ -1,0 +1,36 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "title" : "megasoft_proj",
+    "version" : "1.0.0",
+    "description" : "megasoft_proj"
+  },
+  "paths" : {
+    "/calculator" : {
+      "post" : {
+        "operationId" : "postCalculator",
+        "responses" : {
+          "200" : {
+            "description" : "The operation was successful.",
+            "schema" : {
+              "type" : "string"
+            }
+          }
+        },
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "description" : "Insert a calculation",
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "schema" : {
+            "type" : "integer"
+          },
+          "description" : "The request body for the operation",
+          "required" : true
+        } ]
+      }
+    }
+  },
+  "basePath" : "/project/v1"
+}
