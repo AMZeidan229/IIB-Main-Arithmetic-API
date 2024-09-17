@@ -2,6 +2,10 @@
 
 This repository contains the Arithmetic API for the MegaSoft project. The API provides a variety of arithmetic operations and is designed to integrate seamlessly with the larger MegaSoft infrastructure.
 
+## Objectives & Goals
+The main goal is to develop an API that can efficiently process arithmetic operations. Additionally, the project will focus on implementing a microservices architecture to enhance scalability and maintainability.
+
+
 ## Features
 The Arithmetic API offers:
 - Basic arithmetic operations such as addition, subtraction, multiplication, and division.
